@@ -47,7 +47,7 @@ const ApplyStep6 = () => {
   // STEP 2: Submit and WAIT for result
   // Use .unwrap() or .match() to verify success
   const submitResult = await dispatch(submitEazeCapData({
-    accountId: "001cY00000JXauEQAT",
+    accountId: "0015w00002PoGAnAAN",
     userData: { ...formData }
   }));
 

@@ -6,6 +6,7 @@ const s3Client = new S3Client({
     accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY,
     secretAccessKey: import.meta.env.VITE_AWS_SECRET_KEY,
   },
+  requestChecksumCalculation: "WHEN_REQUIRED",
 });
 export const uploadFileToS3 = async (file: File, folder: string) => {
   const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
@@ -30,6 +31,22 @@ export const uploadFileToS3 = async (file: File, folder: string) => {
     console.error("S3 Upload Error:", error);
     throw error;
   }
+};
+export const uploadFileToS32 = async (file: File, folder: string): Promise<string> => {
+  const fileName = `${Date.now()}-${file.name}`;
+  const fileKey = `${folder}/${fileName}`;
+
+  const command = new PutObjectCommand({
+    Bucket: "eazecap-uploads-2026",
+    Key: fileKey,
+    Body: file,
+    ContentType: file.type,
+  });
+
+  await s3Client.send(command);
+  
+  // Return the key so we can check its status later
+  return fileKey; 
 };
 // export const uploadFileToS3 = async (file: File, folder: string) => {
 //   const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;

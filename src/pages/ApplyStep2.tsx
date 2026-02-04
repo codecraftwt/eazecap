@@ -5,7 +5,8 @@ import ApplicationLayout from "@/components/ApplicationLayout";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ArrowLeft, Upload, CheckCircle2, X } from "lucide-react";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
-import { uploadFileToS3 } from "@/lib/s3Service";
+import { uploadFileToS3, uploadFileToS32 } from "@/lib/s3Service";
+import { waitForSafeScan } from "@/lib/malwareService";
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
@@ -62,22 +63,55 @@ const ApplyStep2 = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    try {
-      setIsUploading(true);
+  //   try {
+  //     setIsUploading(true);
       
-      // Call our utility - specifying the folder "identity-photos"
-      const s3Url = await uploadFileToS3(file, "identity-photos");
+  //     // Call our utility - specifying the folder "identity-photos"
+  //     const s3Url = await uploadFileToS3(file, "identity-photos");
 
-      // Save the resulting URL string to your Zustand store
-      updateFormData("idPhotoUrl", s3Url);
-      // updateFormData("idPhotoUrl", 's3Url');
-      setIdPhoto({ name: file.name, size: file.size });
+  //     // Save the resulting URL string to your Zustand store
+  //     updateFormData("idPhotoUrl", s3Url);
+  //     // updateFormData("idPhotoUrl", 's3Url');
+  //     setIdPhoto({ name: file.name, size: file.size });
       
-    } catch (error) {
-      alert("Failed to upload to AWS. Check your CORS settings.");
-    } finally {
-      setIsUploading(false);
-  };
+  //   } catch (error) {
+  //     alert("Failed to upload to AWS. Check your CORS settings.");
+  //   } finally {
+  //     setIsUploading(false);
+  // };
+
+  try {
+    // 1. Show the user we are busy (Uploading + Scanning)
+    setIsUploading(true);
+    
+    // 2. Upload to S3
+    // Note: uploadFileToS3 should return the fileKey (e.g., "identity-photos/filename.jpg")
+    const fileKey = await uploadFileToS32(file, "identity-photos");
+
+    // 3. Security Check: Polling your Node.js backend
+    // This waits for GuardDuty tags: NO_THREATS_FOUND or THREATS_FOUND
+    const isSafe = await waitForSafeScan(fileKey);
+
+    if (isSafe) {
+      // 4. Success: Update store and UI only after scan passes
+      const s3Url =  `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
+      // const s3Url = await uploadFileToS3(file, "identity-photos");
+      updateFormData("idPhotoUrl", s3Url);
+      setIdPhoto({ name: file.name, size: file.size });
+    } else {
+      // 5. Security Failure: Block the file
+      alert("⚠️ Malware detected! This file has been blocked for security reasons.");
+      e.target.value = ""; // Clear the file input for the user
+    }
+
+  } catch (error: any) {
+    console.error("Process failed:", error);
+    alert(error.message || "Upload failed. Please check your connection.");
+    e.target.value = ""; 
+  } finally {
+    // 6. Finish loading state
+    setIsUploading(false);
+  }
 }
 
   const formatFileSize = (bytes: number) => {

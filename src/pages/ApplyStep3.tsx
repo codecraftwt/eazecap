@@ -5,7 +5,8 @@ import ApplicationLayout from "@/components/ApplicationLayout";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ArrowLeft, Check, Upload, CheckCircle2, X, Loader2 } from "lucide-react";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
-import { uploadFileToS3 } from "@/lib/s3Service"; // Import your S3 utility
+import { uploadFileToS3, uploadFileToS32 } from "@/lib/s3Service"; // Import your S3 utility
+import { waitForSafeScan } from "@/lib/malwareService";
 
 const EMPLOYMENT_LENGTHS = [
   { value: "less_than_1", label: "Less than 1 year" },
@@ -86,16 +87,48 @@ const ApplyStep3 = () => {
   const handleFileChange = (field: keyof FormData, folder: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // try {
+      //   const fieldKey = String(field);
+      //   setUploading(prev => ({ ...prev, [fieldKey]: true }));
+        
+      //   // 1. Upload to S3
+      //   const s3Url = await uploadFileToS3(file, folder);
+        
+      //   // 2. Update Zustand store with the returned URL
+      //   updateFormData(field as keyof FormData, s3Url);
+        
+      // } catch (error) {
+      //   console.error("Upload failed:", error);
+      //   alert("Failed to upload file. Please try again.");
+      // } finally {
+      //   setUploading(prev => ({ ...prev, [String(field)]: false }));
+      // }
+
       try {
         const fieldKey = String(field);
         setUploading(prev => ({ ...prev, [fieldKey]: true }));
-        
+
         // 1. Upload to S3
-        const s3Url = await uploadFileToS3(file, folder);
-        
+        // const s3Url = await uploadFileToS3(file, folder);
+
+        // 3. Wait for Malware Scan Result
+        // This calls your Node.js backend to check for the GuardDuty tags
+        const fileKey = await uploadFileToS32(file, folder);
+
         // 2. Update Zustand store with the returned URL
-        updateFormData(field as keyof FormData, s3Url);
-        
+        const isSafe = await waitForSafeScan(fileKey);
+
+        if (isSafe) {
+          // 4. Success: Update Zustand store with the final S3 path/URL
+          // const s3Url = await uploadFileToS3(file, folder);
+          const s3Url =  `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
+          updateFormData(field as keyof FormData, s3Url);
+        } else {
+          // 5. Security Block: Clear the input and alert the user
+          alert("⚠️ Security Alert: This file was flagged as a potential threat and has been blocked.");
+          e.target.value = ""; // Reset file input
+        }
+
       } catch (error) {
         console.error("Upload failed:", error);
         alert("Failed to upload file. Please try again.");
