@@ -1,0 +1,248 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Clean Light Theme with Navy Accents */
+    --background: 220 20% 98%;
+    --foreground: 222 47% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 15%;
+
+    /* Navy Primary */
+    --primary: 222 47% 20%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Light Purple/Lavender Accent */
+    --secondary: 240 30% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 15% 45%;
+
+    /* Purple Accent for highlights */
+    --accent: 240 35% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 14% 90%;
+    --input: 220 14% 90%;
+    --ring: 222 47% 20%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens */
+    --success: 152 69% 31%;
+    --success-foreground: 0 0% 100%;
+    
+    --navy-50: 220 30% 97%;
+    --navy-100: 220 25% 94%;
+    --navy-200: 220 20% 85%;
+    --navy-600: 222 47% 25%;
+    --navy-700: 222 47% 20%;
+    --navy-800: 222 47% 15%;
+    --navy-900: 222 50% 11%;
+    
+    --purple-400: 240 40% 70%;
+    --purple-500: 240 35% 55%;
+    --purple-600: 240 30% 45%;
+
+    /* Avatar colors */
+    --avatar-rose: 350 80% 60%;
+    --avatar-amber: 38 92% 50%;
+    --avatar-sky: 199 89% 48%;
+    --avatar-emerald: 160 84% 39%;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    --shadow-xl: 0 20px 40px -10px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 2px 8px -2px rgb(0 0 0 / 0.05), 0 0 0 1px rgb(0 0 0 / 0.02);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 220 20% 95%;
+
+    --card: 222 45% 12%;
+    --card-foreground: 220 20% 95%;
+
+    --popover: 222 45% 12%;
+    --popover-foreground: 220 20% 95%;
+
+    --primary: 240 35% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 222 40% 20%;
+    --secondary-foreground: 220 20% 95%;
+
+    --muted: 222 35% 18%;
+    --muted-foreground: 220 15% 60%;
+
+    --accent: 240 35% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 35% 20%;
+    --input: 222 35% 20%;
+    --ring: 240 35% 55%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Subtle grid background pattern */
+.grid-background {
+  background-image: 
+    linear-gradient(to right, hsl(220 14% 92%) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(220 14% 92%) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Gradient overlay for edges */
+.gradient-overlay {
+  background: 
+    linear-gradient(135deg, hsl(240 40% 85% / 0.3) 0%, transparent 50%),
+    linear-gradient(225deg, hsl(45 80% 90% / 0.3) 0%, transparent 50%);
+}
+
+@layer components {
+  .btn-apply {
+    @apply bg-primary text-primary-foreground font-semibold px-10 py-4 rounded-full;
+    @apply flex items-center gap-3 justify-center;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:shadow-xl hover:scale-[1.02];
+    @apply active:scale-[0.98];
+  }
+
+  .input-clean {
+    @apply border border-border bg-card px-4 py-3 text-base rounded-xl transition-all duration-200;
+    @apply focus:border-primary focus:ring-2 focus:ring-primary/10 focus:outline-none;
+    @apply placeholder:text-muted-foreground/60;
+    @apply h-12 w-full;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  select.input-clean {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+    padding-right: 2.5rem;
+  }
+
+  .card-clean {
+    @apply bg-card rounded-2xl border border-border;
+    box-shadow: var(--shadow-card);
+  }
+
+  .trust-badge {
+    @apply flex items-center gap-2 text-sm text-muted-foreground;
+  }
+
+  .form-step-indicator {
+    @apply flex items-center justify-center w-10 h-10 rounded-full text-sm font-semibold transition-all duration-300;
+  }
+
+  .form-step-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .form-step-complete {
+    @apply bg-accent text-accent-foreground;
+  }
+
+  .form-step-pending {
+    @apply bg-muted text-muted-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
