@@ -115,7 +115,7 @@ const Landing = () => {
 };
 
   useEffect(()=>{
-      processSubmission()
+      // processSubmission()
   },[])
 
   const [calcAmount, setCalcAmount] = useState(10000);
