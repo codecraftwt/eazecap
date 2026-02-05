@@ -48,11 +48,18 @@ const PreQualify = () => {
     if (root) root.scrollTo(0, 0);
     window.scrollTo(0, 0);
     
-    const busCode = searchParams.get('bus_code');
+
+  // console.log(busCode2,'busCode2')
+    // const busCode = searchParams.get('buss_code');
+    const busCode = 
+  searchParams.get('buss-code') || // Matches your specific URL
+  searchParams.get('bus-code') ||  // Matches common hyphen use
+  searchParams.get('bus_code');
+    console.log(busCode,'busCode')
     if (busCode && !formData.businessAccountId) {
       updateFormData('businessAccountId', busCode);
     }
-    
+    console.log(formData.businessAccountId,'formData.businessAccountId')
     // Show disclaimer if coming from Apply Now - always show on fresh navigation
     const fromApplyButton = searchParams.get('apply') === 'true';
     
