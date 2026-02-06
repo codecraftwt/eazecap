@@ -44,7 +44,7 @@ const ReferenceForm = ({
   updateFormData: (field: string, value: any) => void 
 }) => {
   const prefix = `reference${num}` as const;
-
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return (
     <div className="space-y-4">
       <h4 className="font-medium text-foreground flex items-center gap-2">
@@ -77,6 +77,23 @@ const ReferenceForm = ({
             placeholder="(555) 123-4567"
           />
         </div>
+        {/* NEW EMAIL FIELD */}
+<div>
+  <label className="block text-sm font-medium text-foreground mb-2">
+    Email Address <span className="text-destructive">*</span>
+  </label>
+  <input
+    type="email"
+    value={formData[`${prefix}Email`] || ''}
+    onChange={(e) => updateFormData(`${prefix}Email`, e.target.value)}
+    className={`input-clean w-full ${
+    formData[`${prefix}Email`] && !emailRegex.test(formData[`${prefix}Email`]) 
+    ? 'border-destructive' 
+    : ''
+  }`}
+    placeholder="jane.smith@example.com"
+  />
+</div>
       </div>
 
       <div>
@@ -155,10 +172,13 @@ const ApplyStep5 = () => {
 
   useScrollToTop();
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   // --- VALIDATION LOGIC ---
   const isValid = 
     formData.reference1Name.trim() !== '' &&
     formData.reference1Phone.replace(/\D/g, '').length === 10 &&
+    emailRegex.test(formData.reference1Email) &&
     formData.reference1Relationship !== '' &&
     formData.reference1Address.trim() !== '' &&
     formData.reference1City.trim() !== '' &&
@@ -166,6 +186,7 @@ const ApplyStep5 = () => {
     formData.reference1ZipCode.length === 5 &&
     formData.reference2Name.trim() !== '' &&
     formData.reference2Phone.replace(/\D/g, '').length === 10 &&
+    emailRegex.test(formData.reference2Email) &&
     formData.reference2Relationship !== '' &&
     formData.reference2Address.trim() !== '' &&
     formData.reference2City.trim() !== '' &&

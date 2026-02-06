@@ -126,7 +126,8 @@ const PreQualify = () => {
   
   // Check if state is fundable
   const isStateEligible = formData.state === '' || !NON_FUNDED_STATES.includes(formData.state);
-  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmailValid = emailRegex.test(formData.email);
   // Validation: all basic fields required + eligibility questions answered + state eligible
   const basicFieldsValid = 
     formData.firstName.trim() !== '' &&
@@ -136,7 +137,7 @@ const PreQualify = () => {
     formData.loanAmount !== '' &&
     formData.employeeType !== '';
   
-  const isValid = basicFieldsValid && allQuestionsAnswered && isEligible && isStateEligible;
+  const isValid = basicFieldsValid && isEmailValid&& allQuestionsAnswered && isEligible && isStateEligible;
 
   const handleContinue = () => {
     setCurrentStep(1);
@@ -304,8 +305,12 @@ const PreQualify = () => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateFormData("email", e.target.value)}
-                    className="input-clean"
+                    className={`input-clean ${formData.email && !isEmailValid ? 'border-destructive' : ''}`}
                   />
+                  {/* Show error message only if they have started typing and it's invalid */}
+  {formData.email && !isEmailValid && (
+    <p className="text-xs text-destructive mt-1">Please enter a valid email address.</p>
+  )}
                 </div>
 
                 <div>

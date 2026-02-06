@@ -75,6 +75,7 @@ export type FormData = {
   reference1City: string;
   reference1State: string;
   reference1ZipCode: string;
+  reference1Email: string
   reference2Name: string;
   reference2Phone: string;
   reference2Relationship: string;
@@ -82,6 +83,7 @@ export type FormData = {
   reference2City: string;
   reference2State: string;
   reference2ZipCode: string;
+  reference2Email: string;
   
   // Step 6 - Consent
   consentCredit: boolean;
@@ -169,6 +171,7 @@ const initialFormData: FormData = {
   reference1City: '',
   reference1State: '',
   reference1ZipCode: '',
+  reference1Email: '',
   reference2Name: '',
   reference2Phone: '',
   reference2Relationship: '',
@@ -176,6 +179,7 @@ const initialFormData: FormData = {
   reference2City: '',
   reference2State: '',
   reference2ZipCode: '',
+  reference2Email: '',
   
   // Step 6 - Consent
   consentCredit: false,

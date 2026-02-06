@@ -7,6 +7,9 @@ import { ChevronRight, ArrowLeft, Check, Upload, CheckCircle2, X, Loader2 } from
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { uploadFileToS3, uploadFileToS32 } from "@/lib/s3Service"; // Import your S3 utility
 import { waitForSafeScan } from "@/lib/malwareService";
+import { fetchDocumentUploadUrl, fetchSalesforceToken } from "@/store/api";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 
 const EMPLOYMENT_LENGTHS = [
   { value: "less_than_1", label: "Less than 1 year" },
@@ -82,10 +85,25 @@ const ApplyStep3 = () => {
     setCurrentStep(4);
     navigate('/apply/step-4');
   };
+const dispatch = useDispatch<AppDispatch>();
+const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
+
 
   // UPDATED: AWS Upload Logic
   const handleFileChange = (field: keyof FormData, folder: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    let currentToken = salesforceToken;
+    
+      // STEP 1: Fetch Token if missing
+      if (!currentToken) {
+        const tokenResult = await dispatch(fetchSalesforceToken());
+        if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
+          currentToken = tokenResult.payload.access_token;
+        } else {
+          return; // Stop if token fails
+        }
+      }
+      console.log(currentToken,'currentToken')
     if (file) {
       // try {
       //   const fieldKey = String(field);
@@ -114,7 +132,8 @@ const ApplyStep3 = () => {
         // 3. Wait for Malware Scan Result
         // This calls your Node.js backend to check for the GuardDuty tags
         const fileKey = await uploadFileToS32(file, folder);
-
+const fileName = fileKey.split('/').pop();
+    console.log(fileName,'fileName');
         // 2. Update Zustand store with the returned URL
         const isSafe = await waitForSafeScan(fileKey);
 
@@ -122,7 +141,23 @@ const ApplyStep3 = () => {
           // 4. Success: Update Zustand store with the final S3 path/URL
           // const s3Url = await uploadFileToS3(file, folder);
           const s3Url =  `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
-          updateFormData(field as keyof FormData, s3Url);
+          // updateFormData(field as keyof FormData, s3Url);
+
+
+          const response = await dispatch(
+                fetchDocumentUploadUrl({
+                  fileName: fileName,
+                  contentType: file.type, 
+                })
+              ).unwrap();
+          
+              // // --- LOGGING THE RESPONSE ---
+              console.log("Salesforce API Response:", response);
+              console.log("Upload URL:", response.uploadUrl);
+              console.log("S3 Key:", response.s3Key);
+          
+              updateFormData(field as keyof FormData, response.uploadUrl);
+                // setIdPhoto({ name: file.name, size: file.size });
         } else {
           // 5. Security Block: Clear the input and alert the user
           alert("⚠️ Security Alert: This file was flagged as a potential threat and has been blocked.");

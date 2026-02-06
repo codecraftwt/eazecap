@@ -15,7 +15,7 @@ const ApplyStep6 = () => {
 
   useScrollToTop();
 
-  const isValid = 
+  const isValid =
     formData.consentCredit &&
     formData.consentElectronic &&
     formData.consentTerms;
@@ -29,39 +29,50 @@ const ApplyStep6 = () => {
   const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  if (e) e.preventDefault();
-  
-  console.log("Submitting application:", formData);
-  let currentToken = salesforceToken;
+    if (e) e.preventDefault();
 
-  // STEP 1: Fetch Token if missing
-  if (!currentToken) {
-    const tokenResult = await dispatch(fetchSalesforceToken());
-    if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
-      currentToken = tokenResult.payload.access_token;
-    } else {
-      return; // Stop if token fails
+    console.log("Submitting application:", formData);
+    let currentToken = salesforceToken;
+
+    // STEP 1: Fetch Token if missing
+    if (!currentToken) {
+      const tokenResult = await dispatch(fetchSalesforceToken());
+      if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
+        currentToken = tokenResult.payload.access_token;
+      } else {
+        return; // Stop if token fails
+      }
     }
-  }
+    console.log(currentToken, 'currentToken')
 
-  // STEP 2: Submit and WAIT for result
-  // Use .unwrap() or .match() to verify success
-  const submitResult = await dispatch(submitEazeCapData({
-    accountId: formData.businessAccountId||"0015w00002PoGAnAAN",
-    userData: { ...formData }
-  }));
+    // STEP 2: Submit and WAIT for result
+    // Use .unwrap() or .match() to verify success
+    const submitResult = await dispatch(submitEazeCapData({
+      accountId: formData.businessAccountId || "0015w00002PoGAnAAN",
+      userData: { ...formData }
+    }));
 
-  if (submitEazeCapData.fulfilled.match(submitResult)) {
-    // ONLY run these if the API call actually succeeded
-    toast.success("Application submitted successfully!");
-    resetForm();
-    navigate('/apply/success');
-  } else {
-    // If it failed, the error toast from your slice's handleAxiosError 
-    // will show up automatically. No need to navigate.
-    console.error("Submission failed");
-  }
-};
+    if (submitEazeCapData.fulfilled.match(submitResult)) {
+      // ONLY run these if the API call actually succeeded
+      toast.success("Application submitted successfully!");
+      resetForm();
+      navigate('/apply/success');
+    } else {
+      // If it failed, the error toast from your slice's handleAxiosError 
+      // will show up automatically. No need to navigate.
+      const errorPayload = submitResult.payload as string;
+
+      // Check if the error message indicates a 500 or server crash
+      if (errorPayload?.includes("500") || errorPayload?.includes("Unexpected error")) {
+        toast.error("Server Error (500): We're having trouble reaching Salesforce. Please try again later.");
+      } else {
+        // Default error for 400s or other issues
+        toast.error(errorPayload || "Submission failed. Please check your details.");
+      }
+
+      console.error("Submission failed:", errorPayload);
+    }
+  };
 
   const formatCurrency = (value: string) => {
     const num = parseFloat(value) || 0;

@@ -16,6 +16,16 @@ interface SubmitDataPayload {
   userData: Record<string, any>;
 }
 
+interface DocumentUploadPayload {
+  fileName: string;
+  contentType: string;
+  // Add other fields if the Salesforce Apex REST expects them
+}
+interface DocumentUploadResponse {
+  uploadUrl: string;
+  s3Key: string;
+}
+
 /* =============================
    HELPERS & ERROR HANDLING
 =============================== */
@@ -87,6 +97,39 @@ export const submitEazeCapData = createAsyncThunk(
   }
 );
 
+/* =========================================================
+   3. GET DOCUMENT UPLOAD URL THUNK
+========================================================= */
+export const fetchDocumentUploadUrl = createAsyncThunk(
+  "salesforce/fetchDocumentUploadUrl",
+  async (payload: DocumentUploadPayload, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { salesforce: SalesforceState };
+      const token = state.salesforce.salesforceToken;
+
+      if (!token) return rejectWithValue("No access token found.");
+
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/services/apexrest/salesforce/eazecap/document/upload-url`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Returns { uploadUrl, s3Key } directly to the component
+      return response.data as DocumentUploadResponse; 
+    } catch (error: any) {
+      const msg = handleAxiosError(error);
+      showError(msg);
+      return rejectWithValue(msg);
+    }
+  }
+);
+
 /* =============================
    SLICE
 =============================== */
@@ -126,7 +169,19 @@ const salesforceSlice = createSlice({
       .addCase(submitEazeCapData.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-      });
+      })
+      /* Document Upload URL Fetching */
+      .addCase(fetchDocumentUploadUrl.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchDocumentUploadUrl.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(fetchDocumentUploadUrl.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
   },
 });
 

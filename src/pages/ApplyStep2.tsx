@@ -7,6 +7,9 @@ import { ChevronRight, ArrowLeft, Upload, CheckCircle2, X } from "lucide-react";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { uploadFileToS3, uploadFileToS32 } from "@/lib/s3Service";
 import { waitForSafeScan } from "@/lib/malwareService";
+import { fetchDocumentUploadUrl, fetchSalesforceToken } from "@/store/api";
+import { AppDispatch, RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
@@ -54,7 +57,8 @@ const ApplyStep2 = () => {
     setCurrentStep(3);
     navigate('/apply/step-3');
   };
-
+const dispatch = useDispatch<AppDispatch>();
+const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
   const handleFileChange =async (e: React.ChangeEvent<HTMLInputElement>) => {
     // const file = e.target.files?.[0];
     // if (file) {
@@ -79,7 +83,18 @@ const ApplyStep2 = () => {
   //   } finally {
   //     setIsUploading(false);
   // };
+let currentToken = salesforceToken;
 
+  // STEP 1: Fetch Token if missing
+  if (!currentToken) {
+    const tokenResult = await dispatch(fetchSalesforceToken());
+    if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
+      currentToken = tokenResult.payload.access_token;
+    } else {
+      return; // Stop if token fails
+    }
+  }
+  console.log(currentToken,'currentToken')
   try {
     // 1. Show the user we are busy (Uploading + Scanning)
     setIsUploading(true);
@@ -91,13 +106,33 @@ const ApplyStep2 = () => {
     // 3. Security Check: Polling your Node.js backend
     // This waits for GuardDuty tags: NO_THREATS_FOUND or THREATS_FOUND
     const isSafe = await waitForSafeScan(fileKey);
-
+    console.log(fileKey,'fileKey')
+    const fileName = fileKey.split('/').pop();
+    console.log(fileName,'fileName');
     if (isSafe) {
       // 4. Success: Update store and UI only after scan passes
       const s3Url =  `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
       // const s3Url = await uploadFileToS3(file, "identity-photos");
-      updateFormData("idPhotoUrl", s3Url);
+      // updateFormData("idPhotoUrl", s3Url);
+      // setIdPhoto({ name: file.name, size: file.size });
+
+
+      const response = await dispatch(
+      fetchDocumentUploadUrl({
+        fileName: fileName,
+        contentType: file.type, 
+      })
+    ).unwrap();
+
+    // // --- LOGGING THE RESPONSE ---
+    console.log("Salesforce API Response:", response);
+    console.log("Upload URL:", response.uploadUrl);
+    console.log("S3 Key:", response.s3Key);
+
+    updateFormData("idPhotoUrl", response.uploadUrl);
       setIdPhoto({ name: file.name, size: file.size });
+
+    // const { uploadUrl, s3Key } = response;
     } else {
       // 5. Security Failure: Block the file
       alert("⚠️ Malware detected! This file has been blocked for security reasons.");
