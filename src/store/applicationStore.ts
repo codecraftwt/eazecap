@@ -38,6 +38,7 @@ export type FormData = {
   idExpiration: string;
   idAddressMatch: boolean | null;
   idPhotoUrl:string
+  idPhotoUrlKey:string
   
   // Step 3 - Employment & Income (W2)
   employerName: string;
@@ -46,13 +47,21 @@ export type FormData = {
   monthlyIncome: string;
   employmentLength: string;
   payStub1Url: string;
+  payStub1Key: string; // Added Key
   payStub2Url: string;
+  payStub2Key: string; // Added Key
   payStub3Url: string;
+  payStub3Key: string; // Added Key
   payStub4Url: string;
+  payStub4Key: string;
   taxTranscript2023Url: string;
+  taxTranscript2023Key: string; // Added Key
   taxTranscript2024Url: string;
+  taxTranscript2024Key: string; // Added Key
   bankStatement1Url: string;
+  bankStatement1Key: string; // Added Key
   bankStatement2Url: string;
+  bankStatement2Key: string; // Added Key
   
   // Step 3 - Employment & Income (Self-Employed)
   businessName: string;
@@ -134,6 +143,7 @@ const initialFormData: FormData = {
   idExpiration: '',
   idAddressMatch: null,
   idPhotoUrl:'',
+  idPhotoUrlKey:'',
   
   // Step 3 - Employment (W2)
   employerName: '',
@@ -147,13 +157,21 @@ const initialFormData: FormData = {
   businessType: '',
   selfEmploymentLength: '',
   payStub1Url: '',
+  payStub1Key: '',
   payStub2Url: '',
+  payStub2Key: '',
   payStub3Url: '',
+  payStub3Key: '',
   payStub4Url: '',
+  payStub4Key: '',
   taxTranscript2023Url: '',
+  taxTranscript2023Key: '',
   taxTranscript2024Url: '',
+  taxTranscript2024Key: '',
   bankStatement1Url: '',
+  bankStatement1Key: '',
   bankStatement2Url: '',
+  bankStatement2Key: '',
   
   // Step 4 - Financial
   housingSituation: '',

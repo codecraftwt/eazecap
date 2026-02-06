@@ -40,7 +40,7 @@ const ApplyStep2 = () => {
 
   useScrollToTop();
 
-  const isValid = 
+  const isValid =
     formData.idType !== '' &&
     formData.idNumber.trim() !== '' &&
     (formData.idType === 'passport' || formData.idState !== '') &&
@@ -57,9 +57,9 @@ const ApplyStep2 = () => {
     setCurrentStep(3);
     navigate('/apply/step-3');
   };
-const dispatch = useDispatch<AppDispatch>();
-const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
-  const handleFileChange =async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // const file = e.target.files?.[0];
     // if (file) {
     //   setIdPhoto({ name: file.name, size: file.size });
@@ -67,87 +67,89 @@ const { salesforceToken, status } = useSelector((state: RootState) => state.sale
     const file = e.target.files?.[0];
     if (!file) return;
 
-  //   try {
-  //     setIsUploading(true);
-      
-  //     // Call our utility - specifying the folder "identity-photos"
-  //     const s3Url = await uploadFileToS3(file, "identity-photos");
+    //   try {
+    //     setIsUploading(true);
 
-  //     // Save the resulting URL string to your Zustand store
-  //     updateFormData("idPhotoUrl", s3Url);
-  //     // updateFormData("idPhotoUrl", 's3Url');
-  //     setIdPhoto({ name: file.name, size: file.size });
-      
-  //   } catch (error) {
-  //     alert("Failed to upload to AWS. Check your CORS settings.");
-  //   } finally {
-  //     setIsUploading(false);
-  // };
-let currentToken = salesforceToken;
+    //     // Call our utility - specifying the folder "identity-photos"
+    //     const s3Url = await uploadFileToS3(file, "identity-photos");
 
-  // STEP 1: Fetch Token if missing
-  if (!currentToken) {
-    const tokenResult = await dispatch(fetchSalesforceToken());
-    if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
-      currentToken = tokenResult.payload.access_token;
-    } else {
-      return; // Stop if token fails
+    //     // Save the resulting URL string to your Zustand store
+    //     updateFormData("idPhotoUrl", s3Url);
+    //     // updateFormData("idPhotoUrl", 's3Url');
+    //     setIdPhoto({ name: file.name, size: file.size });
+
+    //   } catch (error) {
+    //     alert("Failed to upload to AWS. Check your CORS settings.");
+    //   } finally {
+    //     setIsUploading(false);
+    // };
+    let currentToken = salesforceToken;
+
+    // STEP 1: Fetch Token if missing
+    if (!currentToken) {
+      const tokenResult = await dispatch(fetchSalesforceToken());
+      if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
+        currentToken = tokenResult.payload.access_token;
+      } else {
+        return; // Stop if token fails
+      }
+    }
+    console.log(currentToken, 'currentToken')
+    try {
+      // 1. Show the user we are busy (Uploading + Scanning)
+      setIsUploading(true);
+
+      // 2. Upload to S3
+      // Note: uploadFileToS3 should return the fileKey (e.g., "identity-photos/filename.jpg")
+      const fileKey = await uploadFileToS32(file, "identity-photos");
+
+      // 3. Security Check: Polling your Node.js backend
+      // This waits for GuardDuty tags: NO_THREATS_FOUND or THREATS_FOUND
+      const isSafe = await waitForSafeScan(fileKey);
+      console.log(fileKey, 'fileKey')
+      const fileName = fileKey.split('/').pop();
+      console.log(fileName, 'fileName');
+      if (isSafe) {
+        // 4. Success: Update store and UI only after scan passes
+        const s3Url = `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
+        // const s3Url = await uploadFileToS3(file, "identity-photos");
+        // updateFormData("idPhotoUrl", s3Url);
+        // setIdPhoto({ name: file.name, size: file.size });
+
+
+        const response = await dispatch(
+          fetchDocumentUploadUrl({
+            fileName: fileName,
+            contentType: file.type,
+          })
+        ).unwrap();
+
+        // // --- LOGGING THE RESPONSE ---
+        console.log("Salesforce API Response:", response);
+        console.log("Upload URL:", response.uploadUrl);
+        console.log("S3 Key:", response.s3Key);
+
+        updateFormData("idPhotoUrl", s3Url);
+        updateFormData("idPhotoUrlKey", response.s3Key);
+        // updateFormData("idPhotoUrl", response.uploadUrl);
+        setIdPhoto({ name: file.name, size: file.size });
+
+        // const { uploadUrl, s3Key } = response;
+      } else {
+        // 5. Security Failure: Block the file
+        alert("⚠️ Malware detected! This file has been blocked for security reasons.");
+        e.target.value = ""; // Clear the file input for the user
+      }
+
+    } catch (error: any) {
+      console.error("Process failed:", error);
+      alert(error.message || "Upload failed. Please check your connection.");
+      e.target.value = "";
+    } finally {
+      // 6. Finish loading state
+      setIsUploading(false);
     }
   }
-  console.log(currentToken,'currentToken')
-  try {
-    // 1. Show the user we are busy (Uploading + Scanning)
-    setIsUploading(true);
-    
-    // 2. Upload to S3
-    // Note: uploadFileToS3 should return the fileKey (e.g., "identity-photos/filename.jpg")
-    const fileKey = await uploadFileToS32(file, "identity-photos");
-
-    // 3. Security Check: Polling your Node.js backend
-    // This waits for GuardDuty tags: NO_THREATS_FOUND or THREATS_FOUND
-    const isSafe = await waitForSafeScan(fileKey);
-    console.log(fileKey,'fileKey')
-    const fileName = fileKey.split('/').pop();
-    console.log(fileName,'fileName');
-    if (isSafe) {
-      // 4. Success: Update store and UI only after scan passes
-      const s3Url =  `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
-      // const s3Url = await uploadFileToS3(file, "identity-photos");
-      // updateFormData("idPhotoUrl", s3Url);
-      // setIdPhoto({ name: file.name, size: file.size });
-
-
-      const response = await dispatch(
-      fetchDocumentUploadUrl({
-        fileName: fileName,
-        contentType: file.type, 
-      })
-    ).unwrap();
-
-    // // --- LOGGING THE RESPONSE ---
-    console.log("Salesforce API Response:", response);
-    console.log("Upload URL:", response.uploadUrl);
-    console.log("S3 Key:", response.s3Key);
-
-    updateFormData("idPhotoUrl", response.uploadUrl);
-      setIdPhoto({ name: file.name, size: file.size });
-
-    // const { uploadUrl, s3Key } = response;
-    } else {
-      // 5. Security Failure: Block the file
-      alert("⚠️ Malware detected! This file has been blocked for security reasons.");
-      e.target.value = ""; // Clear the file input for the user
-    }
-
-  } catch (error: any) {
-    console.error("Process failed:", error);
-    alert(error.message || "Upload failed. Please check your connection.");
-    e.target.value = ""; 
-  } finally {
-    // 6. Finish loading state
-    setIsUploading(false);
-  }
-}
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + ' B';
@@ -161,7 +163,7 @@ let currentToken = salesforceToken;
         <div className="card-clean p-4 sm:p-6 lg:p-8">
           <h2 className="text-lg sm:text-xl font-bold text-foreground mb-1 sm:mb-2">Identity Verification</h2>
           <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Please provide your identification details</p>
-          
+
           <div className="space-y-5">
             {/* ID Type */}
             <div>
@@ -236,22 +238,20 @@ let currentToken = salesforceToken;
                 <button
                   type="button"
                   onClick={() => updateFormData("idAddressMatch", true)}
-                  className={`flex-1 h-12 px-4 rounded-xl border-2 text-base font-medium transition-all touch-manipulation ${
-                    formData.idAddressMatch === true
+                  className={`flex-1 h-12 px-4 rounded-xl border-2 text-base font-medium transition-all touch-manipulation ${formData.idAddressMatch === true
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-card text-foreground hover:border-primary/50"
-                  }`}
+                    }`}
                 >
                   Yes
                 </button>
                 <button
                   type="button"
                   onClick={() => updateFormData("idAddressMatch", false)}
-                  className={`flex-1 h-12 px-4 rounded-xl border-2 text-base font-medium transition-all touch-manipulation ${
-                    formData.idAddressMatch === false
+                  className={`flex-1 h-12 px-4 rounded-xl border-2 text-base font-medium transition-all touch-manipulation ${formData.idAddressMatch === false
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border bg-card text-foreground hover:border-primary/50"
-                  }`}
+                    }`}
                 >
                   No
                 </button>
@@ -269,7 +269,7 @@ let currentToken = salesforceToken;
                 Upload ID Photo <span className="text-destructive">*</span>
               </label>
               <p className="text-sm text-muted-foreground mb-3">Upload a clear photo or scan of your ID</p>
-              
+
               {idPhoto ? (
                 <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent rounded-xl h-12">
                   <div className="flex items-center gap-3 min-w-0">

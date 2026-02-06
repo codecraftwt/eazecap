@@ -27,7 +27,7 @@ const PAY_FREQUENCIES = [
 const ApplyStep3 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData, setCurrentStep } = useApplicationStore();
-  
+
   // Track uploading state for each field to show loading spinners
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
 
@@ -44,18 +44,18 @@ const ApplyStep3 = () => {
   const usesSelfEmployedDocs = isSelfEmployed || isRetired;
 
   // Validation now checks for the presence of the S3 URL in formData
-  const w2Valid = isW2 && 
+  const w2Valid = isW2 &&
     formData.employerName.trim() !== '' &&
     formData.jobTitle.trim() !== '' &&
     formData.employmentLength !== '' &&
     formData.payFrequency !== '' &&
     formData.monthlyIncome !== '' &&
-    (formData.payFrequency === 'weekly' ? 
+    (formData.payFrequency === 'weekly' ?
       (formData.payStub1Url && formData.payStub2Url && formData.payStub3Url && formData.payStub4Url) :
       formData.payFrequency === 'biweekly' ?
-      (formData.payStub1Url && formData.payStub2Url) :
-      formData.payFrequency === 'monthly' ?
-      formData.payStub1Url : false);
+        (formData.payStub1Url && formData.payStub2Url) :
+        formData.payFrequency === 'monthly' ?
+          formData.payStub1Url : false);
 
   const selfEmployedValid = isSelfEmployed &&
     formData.businessName?.trim() !== '' &&
@@ -85,36 +85,36 @@ const ApplyStep3 = () => {
     setCurrentStep(4);
     navigate('/apply/step-4');
   };
-const dispatch = useDispatch<AppDispatch>();
-const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
+  const dispatch = useDispatch<AppDispatch>();
+  const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
 
 
   // UPDATED: AWS Upload Logic
   const handleFileChange = (field: keyof FormData, folder: string) => async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     let currentToken = salesforceToken;
-    
-      // STEP 1: Fetch Token if missing
-      if (!currentToken) {
-        const tokenResult = await dispatch(fetchSalesforceToken());
-        if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
-          currentToken = tokenResult.payload.access_token;
-        } else {
-          return; // Stop if token fails
-        }
+
+    // STEP 1: Fetch Token if missing
+    if (!currentToken) {
+      const tokenResult = await dispatch(fetchSalesforceToken());
+      if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
+        currentToken = tokenResult.payload.access_token;
+      } else {
+        return; // Stop if token fails
       }
-      console.log(currentToken,'currentToken')
+    }
+    console.log(currentToken, 'currentToken')
     if (file) {
       // try {
       //   const fieldKey = String(field);
       //   setUploading(prev => ({ ...prev, [fieldKey]: true }));
-        
+
       //   // 1. Upload to S3
       //   const s3Url = await uploadFileToS3(file, folder);
-        
+
       //   // 2. Update Zustand store with the returned URL
       //   updateFormData(field as keyof FormData, s3Url);
-        
+
       // } catch (error) {
       //   console.error("Upload failed:", error);
       //   alert("Failed to upload file. Please try again.");
@@ -132,32 +132,34 @@ const { salesforceToken, status } = useSelector((state: RootState) => state.sale
         // 3. Wait for Malware Scan Result
         // This calls your Node.js backend to check for the GuardDuty tags
         const fileKey = await uploadFileToS32(file, folder);
-const fileName = fileKey.split('/').pop();
-    console.log(fileName,'fileName');
+        const fileName = fileKey.split('/').pop();
+        console.log(fileName, 'fileName');
         // 2. Update Zustand store with the returned URL
         const isSafe = await waitForSafeScan(fileKey);
 
         if (isSafe) {
           // 4. Success: Update Zustand store with the final S3 path/URL
           // const s3Url = await uploadFileToS3(file, folder);
-          const s3Url =  `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
+          const s3Url = `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
           // updateFormData(field as keyof FormData, s3Url);
 
 
           const response = await dispatch(
-                fetchDocumentUploadUrl({
-                  fileName: fileName,
-                  contentType: file.type, 
-                })
-              ).unwrap();
-          
-              // // --- LOGGING THE RESPONSE ---
-              console.log("Salesforce API Response:", response);
-              console.log("Upload URL:", response.uploadUrl);
-              console.log("S3 Key:", response.s3Key);
-          
-              updateFormData(field as keyof FormData, response.uploadUrl);
-                // setIdPhoto({ name: file.name, size: file.size });
+            fetchDocumentUploadUrl({
+              fileName: fileName,
+              contentType: file.type,
+            })
+          ).unwrap();
+
+          // // --- LOGGING THE RESPONSE ---
+          console.log("Salesforce API Response:", response);
+          console.log("Upload URL:", response.uploadUrl);
+          console.log("S3 Key:", response.s3Key);
+          const fieldKeyName = String(field);
+          const keyField = fieldKeyName.replace('Url', 'Key') as keyof FormData;
+          updateFormData(field as keyof FormData, s3Url);
+          updateFormData(keyField, response.s3Key);
+          // setIdPhoto({ name: file.name, size: file.size });
         } else {
           // 5. Security Block: Clear the input and alert the user
           alert("⚠️ Security Alert: This file was flagged as a potential threat and has been blocked.");
@@ -174,15 +176,18 @@ const fileName = fileKey.split('/').pop();
   };
 
   const removeFile = (field: keyof FormData) => {
+    const fieldKeyName = String(field);
+    const keyField = fieldKeyName.replace('Url', 'Key') as keyof FormData;
     updateFormData(field, "");
+    updateFormData(keyField, "");
   };
 
-  const FileUploadField = ({ 
-    field, 
+  const FileUploadField = ({
+    field,
     label,
-    folder 
-  }: { 
-    field: keyof FormData; 
+    folder
+  }: {
+    field: keyof FormData;
     label: string;
     folder: string;
   }) => {
@@ -195,7 +200,7 @@ const fileName = fileKey.split('/').pop();
         <label className="block text-sm font-medium text-foreground">
           {label} <span className="text-destructive">*</span>
         </label>
-        
+
         {isUploading ? (
           <div className="flex flex-col items-center justify-center h-[100px] border-2 border-dashed border-primary/30 bg-primary/5 rounded-xl">
             <Loader2 className="w-5 h-5 text-primary animate-spin mb-1" />
@@ -248,7 +253,7 @@ const fileName = fileKey.split('/').pop();
           <p className="text-sm text-muted-foreground mb-4">
             {isW2 ? "Provide details about your W2 employment" : isSelfEmployed ? "Provide details about your self-employment" : isRetired ? "Provide details about your retirement income" : "Please complete pre-qualification first"}
           </p>
-          
+
           <div className="space-y-4">
             {/* Employment Type Badge */}
             {formData.employeeType && (
@@ -428,7 +433,7 @@ const fileName = fileKey.split('/').pop();
             {formData.employeeType && (
               <div className="pt-3 border-t border-border">
                 <h3 className="font-semibold text-foreground text-sm mb-3">Required Documents</h3>
-                
+
                 {isW2 && !formData.payFrequency && (
                   <p className="text-sm text-muted-foreground">
                     Please select your pay frequency above to see required documents.
