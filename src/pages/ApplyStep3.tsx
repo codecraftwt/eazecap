@@ -133,6 +133,9 @@ const ApplyStep3 = () => {
         // This calls your Node.js backend to check for the GuardDuty tags
         const fileKey = await uploadFileToS32(file, folder);
         const fileName = fileKey.split('/').pop();
+        // const keyFieldName = fieldKey
+        //   .replace(/(\d+)/, "file$1") 
+        //   .replace("Url", "Key") as keyof FormData;
         console.log(fileName, 'fileName');
         // 2. Update Zustand store with the returned URL
         const isSafe = await waitForSafeScan(fileKey);
@@ -156,9 +159,16 @@ const ApplyStep3 = () => {
           console.log("Upload URL:", response.uploadUrl);
           console.log("S3 Key:", response.s3Key);
           const fieldKeyName = String(field);
+          const keyFieldName = fieldKeyName
+          .replace(/(\d+)/, "file$1") 
+          .replace("Url", "Key") as keyof FormData;
+          const keyFieldName2 = fieldKeyName
+          .replace(/(\d+)/, "file$1") 
+          .replace("Url", "name") as keyof FormData;
           const keyField = fieldKeyName.replace('Url', 'Key') as keyof FormData;
           updateFormData(field as keyof FormData, s3Url);
-          updateFormData(keyField, response.s3Key);
+          updateFormData(keyFieldName, response.s3Key);
+          updateFormData(keyFieldName2, fileName);
           // setIdPhoto({ name: file.name, size: file.size });
         } else {
           // 5. Security Block: Clear the input and alert the user

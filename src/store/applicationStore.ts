@@ -38,7 +38,9 @@ export type FormData = {
   idExpiration: string;
   idAddressMatch: boolean | null;
   idPhotoUrl:string
-  idPhotoUrlKey:string
+  idPhotofileKey:string
+  idPhotofilename:string
+  // idPhotoKey:string
   
   // Step 3 - Employment & Income (W2)
   employerName: string;
@@ -47,21 +49,29 @@ export type FormData = {
   monthlyIncome: string;
   employmentLength: string;
   payStub1Url: string;
-  payStub1Key: string; // Added Key
+  payStubfile1Key: string; // Added Key
+  payStubfile1name: string; // Added Key
   payStub2Url: string;
-  payStub2Key: string; // Added Key
+  payStubfile2Key: string; // Added Key
+  payStubfile2name: string; // Added Key
   payStub3Url: string;
-  payStub3Key: string; // Added Key
+  payStubfile3Key: string; // Added Key
+  payStubfile3name: string; // Added Key
   payStub4Url: string;
-  payStub4Key: string;
+  payStubfile4Key: string;
+  payStubfile4name: string;
   taxTranscript2023Url: string;
-  taxTranscript2023Key: string; // Added Key
+  taxTranscriptfile2023Key: string; // Added Key
+  taxTranscriptfile2023name: string; // Added Key
   taxTranscript2024Url: string;
-  taxTranscript2024Key: string; // Added Key
+  taxTranscriptfile2024Key: string; // Added Key
+  taxTranscriptfile2024name: string; // Added Key
   bankStatement1Url: string;
-  bankStatement1Key: string; // Added Key
+  bankStatementfile1Key: string; // Added Key
+  bankStatementfile1name: string; // Added Key
   bankStatement2Url: string;
-  bankStatement2Key: string; // Added Key
+  bankStatementfile2Key: string; // Added Key
+  bankStatementfile2name: string; // Added Key
   
   // Step 3 - Employment & Income (Self-Employed)
   businessName: string;
@@ -143,7 +153,8 @@ const initialFormData: FormData = {
   idExpiration: '',
   idAddressMatch: null,
   idPhotoUrl:'',
-  idPhotoUrlKey:'',
+  idPhotofileKey:'',
+  idPhotofilename:'',
   
   // Step 3 - Employment (W2)
   employerName: '',
@@ -157,21 +168,29 @@ const initialFormData: FormData = {
   businessType: '',
   selfEmploymentLength: '',
   payStub1Url: '',
-  payStub1Key: '',
+  payStubfile1Key: '',
+  payStubfile1name: '',
   payStub2Url: '',
-  payStub2Key: '',
+  payStubfile2Key: '',
+  payStubfile2name: '',
   payStub3Url: '',
-  payStub3Key: '',
+  payStubfile3Key: '',
+  payStubfile3name: '',
   payStub4Url: '',
-  payStub4Key: '',
+  payStubfile4Key: '',
+  payStubfile4name: '',
   taxTranscript2023Url: '',
-  taxTranscript2023Key: '',
+  taxTranscriptfile2023Key: '',
+  taxTranscriptfile2023name: '',
   taxTranscript2024Url: '',
-  taxTranscript2024Key: '',
+  taxTranscriptfile2024Key: '',
+  taxTranscriptfile2024name: '',
   bankStatement1Url: '',
-  bankStatement1Key: '',
+  bankStatementfile1Key: '',
+  bankStatementfile1name: '',
   bankStatement2Url: '',
-  bankStatement2Key: '',
+  bankStatementfile2Key: '',
+  bankStatementfile2name: '',
   
   // Step 4 - Financial
   housingSituation: '',
