@@ -10,6 +10,7 @@ import { waitForSafeScan } from "@/lib/malwareService";
 import { fetchDocumentUploadUrl, fetchSalesforceToken } from "@/store/api";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
+import { uploadBinaryToS3 } from "@/lib/s3Upload";
 
 const EMPLOYMENT_LENGTHS = [
   { value: "less_than_1", label: "Less than 1 year" },
@@ -153,6 +154,7 @@ const ApplyStep3 = () => {
               contentType: file.type,
             })
           ).unwrap();
+          await uploadBinaryToS3(response.uploadUrl, file);
 
           // // --- LOGGING THE RESPONSE ---
           console.log("Salesforce API Response:", response);

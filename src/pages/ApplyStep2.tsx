@@ -10,6 +10,7 @@ import { waitForSafeScan } from "@/lib/malwareService";
 import { fetchDocumentUploadUrl, fetchSalesforceToken } from "@/store/api";
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
+import { uploadBinaryToS3 } from "@/lib/s3Upload";
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
   "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
@@ -134,6 +135,8 @@ const ApplyStep2 = () => {
         updateFormData("idPhotofilename", fileName);
         // updateFormData("idPhotoUrl", response.uploadUrl);
         setIdPhoto({ name: file.name, size: file.size });
+
+       await uploadBinaryToS3(response.uploadUrl, file);
 
         // const { uploadUrl, s3Key } = response;
       } else {
