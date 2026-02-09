@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useApplicationStore } from "@/store/applicationStore";
 import ApplicationLayout from "@/components/ApplicationLayout";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ArrowLeft, Upload, CheckCircle2, X } from "lucide-react";
+import { ChevronRight, ArrowLeft, Upload, CheckCircle2, X, Loader2 } from "lucide-react";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { uploadFileToS3, uploadFileToS32 } from "@/lib/s3Service";
 import { waitForSafeScan } from "@/lib/malwareService";
@@ -69,7 +69,7 @@ const ApplyStep2 = () => {
     if (!file) return;
 
     //   try {
-    //     setIsUploading(true);
+        // setIsUploading(true);
 
     //     // Call our utility - specifying the folder "identity-photos"
     //     const s3Url = await uploadFileToS3(file, "identity-photos");
@@ -82,7 +82,7 @@ const ApplyStep2 = () => {
     //   } catch (error) {
     //     alert("Failed to upload to AWS. Check your CORS settings.");
     //   } finally {
-    //     setIsUploading(false);
+        
     // };
     let currentToken = salesforceToken;
 
@@ -274,7 +274,15 @@ const ApplyStep2 = () => {
               </label>
               <p className="text-sm text-muted-foreground mb-3">Upload a clear photo or scan of your ID</p>
 
-              {idPhoto ? (
+              {isUploading ? (
+    /* LOADING STATE */
+    <div className="flex flex-col items-center justify-center h-12 border border-accent/30 bg-accent/5 rounded-xl">
+      <div className="flex items-center gap-3">
+        <Loader2 className="w-5 h-5 text-accent animate-spin" />
+        <span className="text-sm font-medium text-accent">Scanning & Uploading...</span>
+      </div>
+    </div>
+  ) :idPhoto ? (
                 <div className="flex items-center justify-between p-3 bg-accent/10 border border-accent rounded-xl h-12">
                   <div className="flex items-center gap-3 min-w-0">
                     <CheckCircle2 className="w-5 h-5 text-accent flex-shrink-0" />
