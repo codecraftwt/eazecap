@@ -129,7 +129,7 @@ const ApplyStep2 = () => {
         console.log("Upload URL:", response.uploadUrl);
         console.log("S3 Key:", response.s3Key);
 
-        updateFormData("idPhotoUrl", s3Url);
+        // updateFormData("idPhotoUrl", s3Url);
         updateFormData("idPhotofileKey", response.s3Key);
         updateFormData("idPhotofilename", fileName);
         // updateFormData("idPhotoUrl", response.uploadUrl);

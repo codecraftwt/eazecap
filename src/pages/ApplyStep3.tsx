@@ -166,7 +166,7 @@ const ApplyStep3 = () => {
           .replace(/(\d+)/, "file$1") 
           .replace("Url", "name") as keyof FormData;
           const keyField = fieldKeyName.replace('Url', 'Key') as keyof FormData;
-          updateFormData(field as keyof FormData, s3Url);
+          // updateFormData(field as keyof FormData, s3Url);
           updateFormData(keyFieldName, response.s3Key);
           updateFormData(keyFieldName2, fileName);
           // setIdPhoto({ name: file.name, size: file.size });
