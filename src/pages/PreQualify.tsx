@@ -54,7 +54,8 @@ const PreQualify = () => {
     const busCode = 
   searchParams.get('buss-code') || // Matches your specific URL
   searchParams.get('bus-code') ||  // Matches common hyphen use
-  searchParams.get('bus_code');
+  searchParams.get('bus_code')||
+  searchParams.get('buss_code');
     console.log(busCode,'busCode')
     if (busCode && !formData.businessAccountId) {
       updateFormData('businessAccountId', busCode);
