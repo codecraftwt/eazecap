@@ -31,7 +31,7 @@ const ApplyStep6 = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    console.log("Submitting application:", formData);
+    // console.log("Submitting application:", formData);
     const {
     payStub1Url, payStub2Url, payStub3Url, payStub4Url,
     taxTranscript2023Url, taxTranscript2024Url,
@@ -49,7 +49,7 @@ const ApplyStep6 = () => {
         return; // Stop if token fails
       }
     }
-    console.log(currentToken, 'currentToken')
+    // console.log(currentToken, 'currentToken')
 
     // STEP 2: Submit and WAIT for result
     // Use .unwrap() or .match() to verify success

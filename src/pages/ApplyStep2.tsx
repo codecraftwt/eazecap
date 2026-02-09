@@ -95,7 +95,7 @@ const ApplyStep2 = () => {
         return; // Stop if token fails
       }
     }
-    console.log(currentToken, 'currentToken')
+    // console.log(currentToken, 'currentToken')
     try {
       // 1. Show the user we are busy (Uploading + Scanning)
       setIsUploading(true);
@@ -107,9 +107,9 @@ const ApplyStep2 = () => {
       // 3. Security Check: Polling your Node.js backend
       // This waits for GuardDuty tags: NO_THREATS_FOUND or THREATS_FOUND
       const isSafe = await waitForSafeScan(fileKey);
-      console.log(fileKey, 'fileKey')
+      // console.log(fileKey, 'fileKey')
       const fileName = fileKey.split('/').pop();
-      console.log(fileName, 'fileName');
+      // console.log(fileName, 'fileName');
       if (isSafe) {
         // 4. Success: Update store and UI only after scan passes
         const s3Url = `https://eazecap-uploads-2026.s3.amazonaws.com/${fileKey}`;
@@ -126,9 +126,9 @@ const ApplyStep2 = () => {
         ).unwrap();
 
         // // --- LOGGING THE RESPONSE ---
-        console.log("Salesforce API Response:", response);
-        console.log("Upload URL:", response.uploadUrl);
-        console.log("S3 Key:", response.s3Key);
+        // console.log("Salesforce API Response:", response);
+        // console.log("Upload URL:", response.uploadUrl);
+        // console.log("S3 Key:", response.s3Key);
 
         // updateFormData("idPhotoUrl", s3Url);
         updateFormData("idPhotofileKey", response.s3Key);

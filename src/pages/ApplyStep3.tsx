@@ -104,7 +104,7 @@ const ApplyStep3 = () => {
         return; // Stop if token fails
       }
     }
-    console.log(currentToken, 'currentToken')
+    // console.log(currentToken, 'currentToken')
     if (file) {
       // try {
       //   const fieldKey = String(field);
@@ -137,7 +137,7 @@ const ApplyStep3 = () => {
         // const keyFieldName = fieldKey
         //   .replace(/(\d+)/, "file$1") 
         //   .replace("Url", "Key") as keyof FormData;
-        console.log(fileName, 'fileName');
+        // console.log(fileName, 'fileName');
         // 2. Update Zustand store with the returned URL
         const isSafe = await waitForSafeScan(fileKey);
 
@@ -157,9 +157,9 @@ const ApplyStep3 = () => {
           await uploadBinaryToS3(response.uploadUrl, file);
 
           // // --- LOGGING THE RESPONSE ---
-          console.log("Salesforce API Response:", response);
-          console.log("Upload URL:", response.uploadUrl);
-          console.log("S3 Key:", response.s3Key);
+          // console.log("Salesforce API Response:", response);
+          // console.log("Upload URL:", response.uploadUrl);
+          // console.log("S3 Key:", response.s3Key);
           const fieldKeyName = String(field);
           const keyFieldName = fieldKeyName
           .replace(/(\d+)/, "file$1") 
