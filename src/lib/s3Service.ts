@@ -9,7 +9,7 @@ const s3Client = new S3Client({
   requestChecksumCalculation: "WHEN_REQUIRED",
 });
 export const uploadFileToS3 = async (file: File, folder: string) => {
-  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+  const fileName = `${file.name.replace(/\s+/g, '-')}`;
   const fileKey = `${folder}/${fileName}`;
 
   // FIX: Convert File to Uint8Array for browser compatibility
@@ -33,7 +33,7 @@ export const uploadFileToS3 = async (file: File, folder: string) => {
   }
 };
 export const uploadFileToS32 = async (file: File, folder: string): Promise<string> => {
-  const fileName = `${Date.now()}-${file.name}`;
+  const fileName = `${file.name}`;
   const fileKey = `${folder}/${fileName}`;
 
   const command = new PutObjectCommand({
