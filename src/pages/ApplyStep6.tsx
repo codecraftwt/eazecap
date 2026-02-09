@@ -32,6 +32,12 @@ const ApplyStep6 = () => {
     if (e) e.preventDefault();
 
     console.log("Submitting application:", formData);
+    const {
+    payStub1Url, payStub2Url, payStub3Url, payStub4Url,
+    taxTranscript2023Url, taxTranscript2024Url,
+    bankStatement1Url, bankStatement2Url,
+    ...cleanedData 
+  } = formData;
     let currentToken = salesforceToken;
 
     // STEP 1: Fetch Token if missing
@@ -49,7 +55,7 @@ const ApplyStep6 = () => {
     // Use .unwrap() or .match() to verify success
     const submitResult = await dispatch(submitEazeCapData({
       accountId: formData.businessAccountId || "0015w00002PoGAnAAN",
-      userData: { ...formData }
+      userData: { ...cleanedData }
     }));
 
     if (submitEazeCapData.fulfilled.match(submitResult)) {
