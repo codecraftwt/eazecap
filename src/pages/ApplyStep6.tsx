@@ -8,8 +8,10 @@ import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { fetchSalesforceToken, submitEazeCapData } from "@/store/api";
-
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 const ApplyStep6 = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { formData, updateFormData, setCurrentStep, resetForm } = useApplicationStore();
 
@@ -30,54 +32,62 @@ const ApplyStep6 = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     if (e) e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const {
+        payStub1Url, payStub2Url, payStub3Url, payStub4Url,
+        taxTranscript2023Url, taxTranscript2024Url,
+        bankStatement1Url, bankStatement2Url,
+        ...cleanedData
+      } = formData;
+      let currentToken = salesforceToken;
+
+      // STEP 1: Fetch Token if missing
+      if (!currentToken) {
+        const tokenResult = await dispatch(fetchSalesforceToken());
+        if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
+          currentToken = tokenResult.payload.access_token;
+        } else {
+          return; // Stop if token fails
+        }
+      }
+      // console.log(currentToken, 'currentToken')
+
+      // STEP 2: Submit and WAIT for result
+      // Use .unwrap() or .match() to verify success
+      const submitResult = await dispatch(submitEazeCapData({
+        accountId: formData.businessAccountId || "0015w00002PoGAnAAN",
+        userData: { ...cleanedData }
+      }));
+
+      if (submitEazeCapData.fulfilled.match(submitResult)) {
+        // ONLY run these if the API call actually succeeded
+        toast.success("Application submitted successfully!");
+        resetForm();
+        navigate('/apply/success');
+      } else {
+        // If it failed, the error toast from your slice's handleAxiosError 
+        // will show up automatically. No need to navigate.
+        const errorPayload = submitResult.payload as string;
+
+        // Check if the error message indicates a 500 or server crash
+        if (errorPayload?.includes("500") || errorPayload?.includes("Unexpected error")) {
+          toast.error("Server Error (500): We're having trouble reaching Salesforce. Please try again later.");
+        } else {
+          // Default error for 400s or other issues
+          toast.error(errorPayload || "Submission failed. Please check your details.");
+        }
+
+        console.error("Submission failed:", errorPayload);
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false); // Stop Loader regardless of success/fail
+    }
 
     // console.log("Submitting application:", formData);
-    const {
-    payStub1Url, payStub2Url, payStub3Url, payStub4Url,
-    taxTranscript2023Url, taxTranscript2024Url,
-    bankStatement1Url, bankStatement2Url,
-    ...cleanedData 
-  } = formData;
-    let currentToken = salesforceToken;
 
-    // STEP 1: Fetch Token if missing
-    if (!currentToken) {
-      const tokenResult = await dispatch(fetchSalesforceToken());
-      if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
-        currentToken = tokenResult.payload.access_token;
-      } else {
-        return; // Stop if token fails
-      }
-    }
-    // console.log(currentToken, 'currentToken')
-
-    // STEP 2: Submit and WAIT for result
-    // Use .unwrap() or .match() to verify success
-    const submitResult = await dispatch(submitEazeCapData({
-      accountId: formData.businessAccountId || "0015w00002PoGAnAAN",
-      userData: { ...cleanedData }
-    }));
-
-    if (submitEazeCapData.fulfilled.match(submitResult)) {
-      // ONLY run these if the API call actually succeeded
-      toast.success("Application submitted successfully!");
-      resetForm();
-      navigate('/apply/success');
-    } else {
-      // If it failed, the error toast from your slice's handleAxiosError 
-      // will show up automatically. No need to navigate.
-      const errorPayload = submitResult.payload as string;
-
-      // Check if the error message indicates a 500 or server crash
-      if (errorPayload?.includes("500") || errorPayload?.includes("Unexpected error")) {
-        toast.error("Server Error (500): We're having trouble reaching Salesforce. Please try again later.");
-      } else {
-        // Default error for 400s or other issues
-        toast.error(errorPayload || "Submission failed. Please check your details.");
-      }
-
-      console.error("Submission failed:", errorPayload);
-    }
   };
 
   const formatCurrency = (value: string) => {
@@ -304,7 +314,16 @@ const ApplyStep6 = () => {
               <ArrowLeft className="w-4 h-4" /> Back
             </Button>
             <Button onClick={handleSubmit} disabled={!isValid} className="gap-2">
-              Submit Application <Send className="w-4 h-4" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  Submit Application <Send className="w-4 h-4" />
+                </>
+              )}
             </Button>
           </div>
         </div>

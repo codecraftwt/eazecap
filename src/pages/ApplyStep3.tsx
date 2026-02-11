@@ -204,9 +204,16 @@ const ApplyStep3 = () => {
     folder: string;
   }) => {
     const fileUrl = formData[field] as string;
+    // console.log(fileUrl,'fileUrl')
     const isUploading = uploading[String(field)];
     const inputId = `upload-${String(field)}`;
+const fileNameKey = String(field)
+      .replace(/(\d+)/, "file$1")
+      .replace("Url", "name") as keyof FormData;
+    
+    const displayFileName = (formData[fileNameKey] as string) || "File Uploaded";
 
+    console.log(displayFileName,'displayFileName')
     return (
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-foreground">
@@ -224,7 +231,7 @@ const ApplyStep3 = () => {
               <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
               <div className="min-w-0">
                 <p className="text-xs font-medium text-foreground truncate">File Uploaded</p>
-                <p className="text-[10px] text-muted-foreground truncate">Stored in S3</p>
+                <p className="text-[10px] text-muted-foreground truncate">{displayFileName}</p>
               </div>
             </div>
             <button
