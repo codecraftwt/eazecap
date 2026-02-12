@@ -175,7 +175,7 @@ const PreQualify = () => {
   return (
     <>
       {/* Disclaimer Modal */}
-      <Dialog open={showDisclaimer} onOpenChange={() => {}}>
+      <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
         <DialogContent className="sm:max-w-lg w-[calc(100%-2rem)] max-h-[80vh] overflow-y-auto p-4 sm:p-6 rounded-xl" onPointerDownOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle className="text-base sm:text-xl font-bold">
@@ -342,12 +342,23 @@ const PreQualify = () => {
                   </label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">$</span>
-                    <input
+                    {/* <input
                       type="number"
                       value={formData.loanAmount}
                       onChange={(e) => updateFormData("loanAmount", e.target.value)}
                       className="input-clean pl-8"
-                    />
+                    /> */}
+                    <input
+      type="text" // Changed from "number" to "text"
+      value={formData.loanAmount ? Number(formData.loanAmount).toLocaleString() : ""}
+      onChange={(e) => {
+        // Remove all non-digit characters (commas, letters, etc.)
+        const rawValue = e.target.value.replace(/\D/g, "");
+        updateFormData("loanAmount", rawValue);
+      }}
+      placeholder="0"
+      className="input-clean pl-8"
+    />
                   </div>
                 </div>
               </div>

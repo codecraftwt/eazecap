@@ -185,7 +185,7 @@ const Landing = () => {
             </h1>
             
             <p className="text-sm sm:text-lg text-muted-foreground mb-6 sm:mb-10 max-w-lg mx-auto leading-relaxed px-2">
-              Access $5,000 to $25,000 with competitive rates and transparent terms. Get pre-approved in minutes with no impact to your credit score.
+              Access $25,000 to $30,000 with competitive rates and transparent terms. Get pre-approved in minutes with no impact to your credit score.
             </p>
 
             {/* CTA Buttons */}
@@ -365,12 +365,12 @@ const Landing = () => {
                       onChange={(e) => setCalcAmount(Number(e.target.value))}
                       className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-primary"
                       min="5000"
-                      max="25000"
+                      max="30000"
                       step="1000"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
                       <span>$5,000</span>
-                      <span>$25,000</span>
+                      <span>$30,000</span>
                     </div>
                   </div>
                   

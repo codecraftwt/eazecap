@@ -86,13 +86,25 @@ const ApplyStep4 = () => {
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-sm sm:text-base">$</span>
-                  <input
+                  {/* <input
                     type="number"
                     value={formData.monthlyHousingPayment}
                     onChange={(e) => updateFormData("monthlyHousingPayment", e.target.value)}
                     className="input-clean w-full pl-8 text-sm sm:text-base"
                     placeholder="1,500"
-                  />
+                  /> */}
+                  <input
+    type="text"
+    inputMode="numeric"
+    value={formData.monthlyHousingPayment ? Number(formData.monthlyHousingPayment).toLocaleString() : ""}
+    onChange={(e) => {
+      // Strip out everything except digits to keep the state clean
+      const rawValue = e.target.value.replace(/\D/g, "");
+      updateFormData("monthlyHousingPayment", rawValue);
+    }}
+    className="input-clean w-full pl-8 text-sm sm:text-base"
+    placeholder="1,500"
+  />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   {formData.housingSituation === 'own' ? 'Mortgage payment' : 

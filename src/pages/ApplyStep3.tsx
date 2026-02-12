@@ -351,13 +351,24 @@ const fileNameKey = String(field)
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                    <input
+                    {/* <input
                       type="number"
                       value={formData.monthlyIncome}
                       onChange={(e) => updateFormData("monthlyIncome", e.target.value)}
                       className="input-clean pl-7"
                       placeholder="5,000"
-                    />
+                    /> */}
+                    <input
+      type="text"
+      value={formData.monthlyIncome ? Number(formData.monthlyIncome).toLocaleString() : ""}
+      onChange={(e) => {
+        // Removes anything that isn't a digit
+        const rawValue = e.target.value.replace(/\D/g, "");
+        updateFormData("monthlyIncome", rawValue);
+      }}
+      className="input-clean pl-8"
+      placeholder="5,000"
+    />
                   </div>
                 </div>
               </>
