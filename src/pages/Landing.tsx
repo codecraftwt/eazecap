@@ -185,7 +185,7 @@ const Landing = () => {
             </h1>
             
             <p className="text-sm sm:text-lg text-muted-foreground mb-6 sm:mb-10 max-w-lg mx-auto leading-relaxed px-2">
-              Access $25,000 to $30,000 with competitive rates and transparent terms. Get pre-approved in minutes with no impact to your credit score.
+              Access $5,000 to $30,000 with competitive rates and transparent terms. Get pre-approved in minutes with no impact to your credit score.
             </p>
 
             {/* CTA Buttons */}
