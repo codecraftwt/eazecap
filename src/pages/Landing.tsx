@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Clock, Shield, Mail, Lock, Calendar, DollarSign, CheckCircle, 
   Calculator, Building2, TrendingUp, ArrowRight, Sparkles, 
@@ -43,80 +43,29 @@ const steps = [
 ];
 
 const Landing = () => {
+  const [searchParams] = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
   const { salesforceToken, status } = useSelector((state: RootState) => state.salesforce);
-
-  const [formData, setFormData] = useState({
-    firstname: '',
-    email: '',
-  });
+  const { formData, updateFormData, setCurrentStep } = useApplicationStore();
 
   // 3. The Submit Logic
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  
 
-    let currentToken = salesforceToken;
+  
 
-    // STEP 1: Fetch Token if we don't have one in Redux
-    if (!currentToken) {
-      const tokenResult = await dispatch(fetchSalesforceToken());
-      
-      // Check if the token fetch was successful
-      if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
-        currentToken = tokenResult.payload.access_token;
-      } else {
-        return; // Error toast is already handled in your slice
-      }
+  const busCode = 
+  searchParams.get('buss-code') || // Matches your specific URL
+  searchParams.get('bus-code') ||  // Matches common hyphen use
+  searchParams.get('bus_code')||
+  searchParams.get('buss_code');
+    console.log(busCode,'busCode')
+    // console.log(formData,'formData')
+    if (busCode && !formData.businessAccountId) {
+      localStorage.setItem('busCode',busCode)
+      updateFormData('businessAccountId', busCode);
+      console.log(formData.businessAccountId,'formData.businessAccountId')
     }
-
-    // STEP 2: Submit the form data
-    dispatch(submitEazeCapData({
-      accountId: "001cY00000JXauEQAT", // Your Registration Code
-      userData: {
-        firstname: formData.firstname,
-        email: formData.email,
-        // Add other fields here...
-      }
-    }));
-  };
-
-  const processSubmission = async () => {
-  try {
-    // await dispatch(fetchSalesforceToken());
-
-    let currentToken = salesforceToken;
-
-    // STEP 1: Fetch Token if we don't have one in Redux
-    if (!currentToken) {
-      const tokenResult = await dispatch(fetchSalesforceToken());
-      
-      // Check if the token fetch was successful
-      if (fetchSalesforceToken.fulfilled.match(tokenResult)) {
-        currentToken = tokenResult.payload.access_token;
-      } else {
-        return; // Error toast is already handled in your slice
-      }
-    }
-
-    // STEP 2: Submit the form data
-    dispatch(submitEazeCapData({
-      accountId: "001cY00000JXauEQAT", // Your Registration Code
-      userData: {
-        firstname: formData.firstname,
-        email: formData.email,
-        // Add other fields here...
-      }
-    }));
-
-    // console.log("Success:", result);
-  } catch (err) {
-    console.error("Error:", err);
-  }
-};
-
-  useEffect(()=>{
-      // processSubmission()
-  },[])
+    // console.log(formData,'formData222')
 
   const [calcAmount, setCalcAmount] = useState(10000);
   const navigate = useNavigate();
@@ -124,7 +73,7 @@ const Landing = () => {
 
   const handleApplyClick = () => {
     resetForm();
-    navigate('/pre-qualify?apply=true');
+    navigate(`/pre-qualify?apply=true&buss_code=${busCode}`);
   };
 
   const monthlyPayment = useMemo(() => {

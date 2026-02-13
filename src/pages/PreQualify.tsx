@@ -51,16 +51,23 @@ const PreQualify = () => {
 
   // console.log(busCode2,'busCode2')
     // const busCode = searchParams.get('buss_code');
-    const busCode = 
+    let busCode:any = 
   searchParams.get('buss-code') || // Matches your specific URL
   searchParams.get('bus-code') ||  // Matches common hyphen use
   searchParams.get('bus_code')||
   searchParams.get('buss_code');
     console.log(busCode,'busCode')
-    if (busCode && !formData.businessAccountId) {
+    
+    if (busCode !== null && !formData.businessAccountId) {
+      // debugger
       updateFormData('businessAccountId', busCode);
     }
-    console.log(formData.businessAccountId,'formData.businessAccountId')
+    // else{
+    //   busCode = localStorage.getItem('busCode')
+    //   updateFormData('businessAccountId', busCode);
+    // }
+    // console.log(formData,'formData')
+    // console.log(formData.businessAccountId,'formData.businessAccountId')
     // Show disclaimer if coming from Apply Now - always show on fresh navigation
     const fromApplyButton = searchParams.get('apply') === 'true';
     
@@ -469,7 +476,7 @@ const PreQualify = () => {
               </div>
 
               <div className="flex justify-between pt-6 border-t border-border">
-                <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
+                <Button variant="ghost" onClick={() => navigate(`/?buss_code=${localStorage.getItem('busCode')}`)} className="gap-2">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </Button>
                 <Button onClick={handleContinue} disabled={!isValid} className="gap-2">
