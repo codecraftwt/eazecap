@@ -48,6 +48,7 @@ const ApplyStep3 = () => {
   const w2Valid = isW2 &&
     formData.employerName.trim() !== '' &&
     formData.jobTitle.trim() !== '' &&
+    formData.employmentStartDate.trim() !== '' &&
     formData.employmentLength !== '' &&
     formData.payFrequency !== '' &&
     formData.monthlyIncome !== '' &&
@@ -61,6 +62,7 @@ const ApplyStep3 = () => {
   const selfEmployedValid = isSelfEmployed &&
     formData.businessName?.trim() !== '' &&
     formData.businessType?.trim() !== '' &&
+    formData.selfEmploymentStartDate?.trim() !== '' &&
     formData.selfEmploymentLength !== '' &&
     formData.monthlyIncome !== '' &&
     formData.taxTranscript2023Url &&
@@ -315,6 +317,17 @@ const fileNameKey = String(field)
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">
+                      Employment Start Date <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.employmentStartDate}
+                      onChange={(e) => updateFormData("employmentStartDate", e.target.value)}
+                      className="input-clean"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">
                       Employment Length <span className="text-destructive">*</span>
                     </label>
                     <select
@@ -328,6 +341,9 @@ const fileNameKey = String(field)
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">
                       Pay Frequency <span className="text-destructive">*</span>
@@ -407,6 +423,17 @@ const fileNameKey = String(field)
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">
+                      Employment Start Date <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.selfEmploymentStartDate || ''}
+                      onChange={(e) => updateFormData("selfEmploymentStartDate", e.target.value)}
+                      className="input-clean"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">
                       Self-Employment Length <span className="text-destructive">*</span>
                     </label>
                     <select
@@ -420,6 +447,9 @@ const fileNameKey = String(field)
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1.5">
                       Monthly Income (Gross) <span className="text-destructive">*</span>
