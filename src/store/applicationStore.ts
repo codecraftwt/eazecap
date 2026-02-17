@@ -45,6 +45,7 @@ export type FormData = {
   // Step 3 - Employment & Income (W2)
   employerName: string;
   jobTitle: string;
+  employmentStartDate: string;
   payFrequency: 'weekly' | 'biweekly' | 'monthly' | '';
   monthlyIncome: string;
   employmentLength: string;
@@ -76,6 +77,7 @@ export type FormData = {
   // Step 3 - Employment & Income (Self-Employed)
   businessName: string;
   businessType: string;
+  selfEmploymentStartDate: string;
   selfEmploymentLength: string;
   
   // Step 4 - Financial Details
@@ -159,6 +161,7 @@ const initialFormData: FormData = {
   // Step 3 - Employment (W2)
   employerName: '',
   jobTitle: '',
+  employmentStartDate: '',
   payFrequency: '',
   monthlyIncome: '',
   employmentLength: '',
@@ -166,6 +169,7 @@ const initialFormData: FormData = {
   // Step 3 - Employment (Self-Employed)
   businessName: '',
   businessType: '',
+  selfEmploymentStartDate: '',
   selfEmploymentLength: '',
   payStub1Url: '',
   payStubfile1Key: '',
