@@ -32,6 +32,12 @@ interface DocumentUploadResponse {
 const showError = (msg: string) => toast.error(msg);
 const showSuccess = (msg: string) => toast.success(msg);
 
+/** Do not show these messages to customers (toast only when false). */
+const isTokenOrAuthCustomerMessage = (msg: string) =>
+  /token|unauthorized|session|expired|401|403|bearer|authenticate|no access token/i.test(
+    String(msg).toLowerCase()
+  );
+
 const handleAxiosError = (error: any) => {
   if (error.message === "Network Error" || !error.response) {
     return "Connection to Salesforce failed. Check CORS or Network.";
@@ -58,7 +64,7 @@ export const fetchSalesforceToken = createAsyncThunk(
       return response.data; // Expected { access_token: "..." }
     } catch (error: any) {
       const msg = handleAxiosError(error);
-      showError(msg);
+      // Do not surface token fetch errors to the customer
       return rejectWithValue(msg);
     }
   }
@@ -91,7 +97,9 @@ export const submitEazeCapData = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       const msg = handleAxiosError(error);
-      showError(msg);
+      if (!isTokenOrAuthCustomerMessage(msg)) {
+        showError(msg);
+      }
       return rejectWithValue(msg);
     }
   }
@@ -124,7 +132,9 @@ export const fetchDocumentUploadUrl = createAsyncThunk(
       return response.data as DocumentUploadResponse; 
     } catch (error: any) {
       const msg = handleAxiosError(error);
-      showError(msg);
+      if (!isTokenOrAuthCustomerMessage(msg)) {
+        showError(msg);
+      }
       return rejectWithValue(msg);
     }
   }
