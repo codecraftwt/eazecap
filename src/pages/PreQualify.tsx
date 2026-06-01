@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import EazeLogo from "@/components/EazeLogo";
+import { busCodeFromSearchParams, normalizeBusCode } from "@/utils/busCode";
 
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
@@ -49,23 +50,13 @@ const PreQualify = () => {
     window.scrollTo(0, 0);
     
 
-  // console.log(busCode2,'busCode2')
-    // const busCode = searchParams.get('buss_code');
-    let busCode:any = 
-  searchParams.get('buss-code') || // Matches your specific URL
-  searchParams.get('bus-code') ||  // Matches common hyphen use
-  searchParams.get('bus_code')||
-  searchParams.get('buss_code');
-    console.log(busCode,'busCode')
-    
-    if (busCode !== null && !formData.businessAccountId) {
-      // debugger
-      updateFormData('businessAccountId', busCode);
+    const fromUrl = busCodeFromSearchParams(searchParams);
+    const fromStorage = normalizeBusCode(localStorage.getItem("busCode"));
+    const busCode = fromUrl ?? fromStorage;
+
+    if (busCode && !normalizeBusCode(formData.businessAccountId)) {
+      updateFormData("businessAccountId", busCode);
     }
-    // else{
-    //   busCode = localStorage.getItem('busCode')
-    //   updateFormData('businessAccountId', busCode);
-    // }
     // console.log(formData,'formData')
     // console.log(formData.businessAccountId,'formData.businessAccountId')
     // Show disclaimer if coming from Apply Now - always show on fresh navigation

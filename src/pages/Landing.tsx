@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { busCodeFromSearchParams, normalizeBusCode } from "@/utils/busCode";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Clock, Shield, Mail, Lock, Calendar, DollarSign, CheckCircle, 
@@ -53,27 +54,33 @@ const Landing = () => {
 
   
 
-  const busCode = 
-  searchParams.get('buss-code') || // Matches your specific URL
-  searchParams.get('bus-code') ||  // Matches common hyphen use
-  searchParams.get('bus_code')||
-  searchParams.get('buss_code');
-    console.log(busCode,'busCode')
-    // console.log(formData,'formData')
-    if (busCode && !formData.businessAccountId) {
-      localStorage.setItem('busCode',busCode)
-      updateFormData('businessAccountId', busCode);
-      console.log(formData.businessAccountId,'formData.businessAccountId')
+  const busCode = useMemo(
+    () => busCodeFromSearchParams(searchParams),
+    [searchParams]
+  );
+
+  useEffect(() => {
+    if (busCode && !normalizeBusCode(formData.businessAccountId)) {
+      localStorage.setItem("busCode", busCode);
+      updateFormData("businessAccountId", busCode);
     }
-    // console.log(formData,'formData222')
+  }, [busCode, formData.businessAccountId, updateFormData]);
 
   const [calcAmount, setCalcAmount] = useState(10000);
   const navigate = useNavigate();
   const resetForm = useApplicationStore((state) => state.resetForm);
 
   const handleApplyClick = () => {
+    const fromStorage = normalizeBusCode(localStorage.getItem("busCode"));
+    const effective = busCode ?? fromStorage;
     resetForm();
-    navigate(`/pre-qualify?apply=true&buss_code=${busCode}`);
+    if (effective) {
+      localStorage.setItem("busCode", effective);
+      updateFormData("businessAccountId", effective);
+    }
+    const qs = new URLSearchParams({ apply: "true" });
+    if (effective) qs.set("buss_code", effective);
+    navigate(`/pre-qualify?${qs.toString()}`);
   };
 
   const monthlyPayment = useMemo(() => {
@@ -440,8 +447,8 @@ const Landing = () => {
                 <a href="mailto:docs@eazeconsulting.com" className="text-xs sm:text-sm text-background/70 hover:text-secondary flex items-center gap-2 transition-colors">
                   <Mail className="w-4 h-4" /> docs@eazeconsulting.com
                 </a>
-                <a href="tel:+1-800-555-0123" className="text-xs sm:text-sm text-background/70 hover:text-secondary flex items-center gap-2 transition-colors">
-                  <Phone className="w-4 h-4" /> 1-800-555-0123
+                <a href="tel:+310-846-8535" className="text-xs sm:text-sm text-background/70 hover:text-secondary flex items-center gap-2 transition-colors">
+                  <Phone className="w-4 h-4" /> 310-846-8535
                 </a>
               </div>
             </div>

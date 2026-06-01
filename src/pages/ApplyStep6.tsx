@@ -10,6 +10,7 @@ import { AppDispatch, RootState } from "@/store/store";
 import { fetchSalesforceToken, submitEazeCapData } from "@/store/api";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { normalizeBusCode } from "@/utils/busCode";
 const ApplyStep6 = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const ApplyStep6 = () => {
       // STEP 2: Submit and WAIT for result
       // Use .unwrap() or .match() to verify success
       const submitResult = await dispatch(submitEazeCapData({
-        accountId: formData.businessAccountId || "0015w00002PoGAnAAN",
+        accountId: normalizeBusCode(formData.businessAccountId) ?? "0015w00002PoGAnAAN",
         userData: { ...cleanedData }
       }));
 
