@@ -27,7 +27,7 @@ const US_STATES = [
 
 const NON_FUNDED_STATES = [
   "Montana", "New York", "Delaware", "Indiana", "Mississippi", 
-  "California", "Nevada", "West Virginia", "Connecticut", "Washington", "Maine"
+  "California", "Connecticut", "Washington", "Maine"
 ];
 
 const EMPLOYEE_TYPES = [
